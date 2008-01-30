@@ -1,0 +1,16 @@
+-----------------------------------------------------------------------------
+Why do we need use Erlang with FastCGI when we have YAWS? Isn't it
+stable enough or maybe there are oher reasons that I know nothing
+about?
+    
+    Yaws is pretty awesome. However, its still pretty new with a
+    pretty small base of users, which makes some people uncomfortable
+    with it. Also in many companies (including my own) http servers
+    have to go through a rigorous vetting process before they can be
+    exposed to users. Its far easier just to use the existing servers
+    with fastcgi support then to try and get yaws approved (it just
+    wouldn't be in all actuality. The security guys are real stick in
+    the muds). Also, I already run lighttpd as my principle server,
+    its much nicer just to sit dynamic behavior behind that then it is
+    to manage and run another http server.
+----------------------------------------------------------------------------

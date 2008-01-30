@@ -1,0 +1,19 @@
+ The efcgi application is an OTP application that supports the fast cgi
+protocol. Currently the system expects to communicate with the fastcgi
+server via tcp sockets only. It also expects to be started by the otp
+release handling system, and configured after start by the application
+making use of the system.
+
+
+Starting and testing from the shell
+
+> application:start(efcgi).
+> efcgi:start(<Port Number>, <Module Name>).
+
+This will start a fast cgi process on the specified port with the
+specified module as the handler. The module must implement the
+gen_efcgi behaviour or bad things happen.
+
+If you are using fast cgi as part of an otp system the release handler
+will start efcgi for you. All you need do is call efcgi:start/2 in
+ your initialization routine.
