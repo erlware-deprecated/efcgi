@@ -1,23 +1,33 @@
+%% -*- mode: Erlang; fill-column: 132; comment-column: 118; -*-
 %%%-------------------------------------------------------------------
-%%% Copyright 2006 Eric Merritt
+%%% Copyright (c) 2006, 2007 Erlware
 %%%
-%%% Licensed under the Apache License, Version 2.0 (the "License");  
-%%% you may not use this file except in compliance with the License.
-%%% You may obtain a copy of the License at
+%%% Permission is hereby granted, free of charge, to any
+%%% person obtaining a copy of this software and associated
+%%% documentation files (the "Software"), to deal in the
+%%% Software without restriction, including without limitation
+%%% the rights to use, copy, modify, merge, publish, distribute,
+%%% sublicense, and/or sell copies of the Software, and to permit
+%%% persons to whom the Software is furnished to do so, subject to
+%%% the following conditions:
 %%%
-%%%       http://www.apache.org/licenses/LICENSE-2.0
+%%% The above copyright notice and this permission notice shall
+%%% be included in all copies or substantial portions of the Software.
 %%%
-%%%  Unless required by applicable law or agreed to in writing, software
-%%%  distributed under the License is distributed on an "AS IS" BASIS,
-%%%  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-%%%  implied. See the License for the specific language governing 
-%%%  permissions and limitations under the License.
-%%%
+%%% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+%%% EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+%%% OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+%%% NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+%%% HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+%%% WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+%%% OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+%%% OTHER DEALINGS IN THE SOFTWARE.
 %%%---------------------------------------------------------------------------
 %%% @author Eric Merritt <cyberlync@gmail.com>
 %%% @doc
 %%%  Support for basic fastcgi protocol parsing.
-%%% @end 
+%%% @end
+%%% @copyright 2006 Erlware
 %%%----------------------------------------------------------------------------
 -module(efcgi_socket).
 
@@ -34,7 +44,7 @@
              max_reqs}).
 
 -record(request, {version, type, request_id,
-                  content_length, reserved, 
+                  content_length, reserved,
                   content=[]}).
 
 -define(SERVER_IDLE_TIMEOUT, 30*1000).
@@ -51,16 +61,16 @@
 %%====================================================================
 
 %%--------------------------------------------------------------------
-%% @spec start_link(ListingPid::pid(), ListenSocket::socket(), 
-%%                  ListenPort::integer(), MaxConns::integer(), 
+%% @spec start_link(ListingPid::pid(), ListenSocket::socket(),
+%%                  ListenPort::integer(), MaxConns::integer(),
 %%                  MaxReqs::integer()) -> ok.
-%% 
-%% @doc 
+%%
+%% @doc
 %%  Start the socket worker for the efcgi protocol parsing.
 %% @end
 %%--------------------------------------------------------------------
 start_link(ListenPid, ListenSocket, ListenPort, Pid, Options) ->
-    proc_lib:spawn_link(?MODULE, init, [ListenPid, ListenSocket, 
+    proc_lib:spawn_link(?MODULE, init, [ListenPid, ListenSocket,
                                          ListenPort, Pid,
                                          Options]).
 
@@ -68,20 +78,20 @@ start_link(ListenPid, ListenSocket, ListenPort, Pid, Options) ->
 %% Internal functions
 %%====================================================================
 %%--------------------------------------------------------------------
-%% @spec init(ListenPid::pid(), ListenSocket::socket(), 
+%% @spec init(ListenPid::pid(), ListenSocket::socket(),
 %%                  ListenPort::integer()) -> ok.
-%% 
-%% @doc 
+%%
+%% @doc
 %%  Initialize the worker, listen to the main socket and accept
 %%  connections then go on to handle the connections.
 %% @end
 %%--------------------------------------------------------------------
 init(ListenPid, ListenSocket, ListenPort, Pid, Options) ->
-    MaxConns = get_option(max_conns, Options, ?FCGI_DEFAULT_MAX_CONNS), 
+    MaxConns = get_option(max_conns, Options, ?FCGI_DEFAULT_MAX_CONNS),
     MaxReqs = get_option(max_reqs, Options, ?FCGI_DEFAULT_MAX_REQS),
     case catch gen_tcp:accept(ListenSocket) of
 	{ok, Socket} ->
-            %% Send the cast message to the listener process to 
+            %% Send the cast message to the listener process to
             %% create a new acceptor
 	    efcgi_server:create(ListenPid, self()),
 	    {ok, {Addr, Port}} = inet:peername(Socket),
@@ -103,9 +113,9 @@ init(ListenPid, ListenSocket, ListenPort, Pid, Options) ->
 
 %%--------------------------------------------------------------------
 %% @spec request(State) -> ok.
-%% 
-%% @doc 
-%%  Start processing requests from the server. 
+%%
+%% @doc
+%%  Start processing requests from the server.
 %% @end
 %%--------------------------------------------------------------------
 request(C = #c{sock=Sock}) ->
@@ -116,7 +126,7 @@ request(C = #c{sock=Sock}) ->
                                              type=Type,
                                              request_id=RequestId,
                                              content_length=ContentLength,
-                                             reserved=Reserved}, 
+                                             reserved=Reserved},
                                  PaddingLength);
         ExitReason = {error, _} ->
             exit(ExitReason)
@@ -126,15 +136,15 @@ request(C = #c{sock=Sock}) ->
 
 %%--------------------------------------------------------------------
 %% @spec process_request_body(State, Request)-> ok.
-%% 
-%% @doc 
-%%  Process the body of the request record using the content and 
+%%
+%% @doc
+%%  Process the body of the request record using the content and
 %%  padding length provided. Then forward request for further processing.
 %% @end
 %%--------------------------------------------------------------------
 process_request_body(C, Request = #request{content_length = 0}, 0) ->
     handle_request(C, Request#request{content= <<>>});
-process_request_body(C = #c{sock=Sock}, 
+process_request_body(C = #c{sock=Sock},
                      Request = #request{content_length=ContentLength},
                      PaddingLength) ->
     case gen_tcp:recv(Sock, ContentLength + PaddingLength, 30000) of
@@ -147,8 +157,8 @@ process_request_body(C = #c{sock=Sock},
 
 %%--------------------------------------------------------------------
 %% @spec handle_request(State, Request) -> ok.
-%% 
-%% @doc 
+%%
+%% @doc
 %%  Handle the request by spinning it off for further processing.
 %% @end
 %%--------------------------------------------------------------------
@@ -160,41 +170,41 @@ handle_request(C, Request) ->
 
 %%--------------------------------------------------------------------
 %% @spec management_request(State, Request) -> ok.
-%% 
-%% @doc 
-%%  Handle discrete management requests. 
+%%
+%% @doc
+%%  Handle discrete management requests.
 %% @end
 %%--------------------------------------------------------------------
 management_request(C, #request{type=?FCGI_GET_VALUES,
                                content=Content}) ->
     Pairs = efcgi_parse:parse_pairs(Content),
     Resp = generate_values_response(C, Pairs, []),
-    efcgi_parse:write_record(C, ?FCGI_GET_VALUES_RESULT, 
+    efcgi_parse:write_record(C, ?FCGI_GET_VALUES_RESULT,
                              ?FCGI_NULL_REQUEST_ID, Resp);
 management_request(C, #request{type=Type}) ->
     Content = <<Type:8, 0:56>>,
-    efcgi_parse:write_record(C, ?FCGI_UNKNOWN_TYPE, 
+    efcgi_parse:write_record(C, ?FCGI_UNKNOWN_TYPE,
                              ?FCGI_NULL_REQUEST_ID, Content).
 
 %%--------------------------------------------------------------------
 %% @spec generate_values_response(State, Pairs, Acc) -> Bin
-%% 
-%% @doc 
+%%
+%% @doc
 %%  Generate the appropriate responses to each of the get value
 %%  types.
 %% @end
 %%--------------------------------------------------------------------
-generate_values_response(C = #c{max_conns=MaxConns}, 
+generate_values_response(C = #c{max_conns=MaxConns},
                          [{<<?FCGI_MAX_CONNS>>, _} | T], Acc) ->
-    generate_values_response(C, T, [{<<?FCGI_MAX_CONNS>>, <<MaxConns:32>>} 
+    generate_values_response(C, T, [{<<?FCGI_MAX_CONNS>>, <<MaxConns:32>>}
                                   | Acc]);
-generate_values_response(C = #c{max_reqs=MaxReqs}, 
+generate_values_response(C = #c{max_reqs=MaxReqs},
                          [{<<?FCGI_MAX_REQS>>, _} | T], Acc) ->
     generate_values_response(C, T, [{<<?FCGI_MAX_REQS>>, <<MaxReqs:32>>} |
                                  Acc]);
-generate_values_response(C, 
+generate_values_response(C,
                          [{<<?FCGI_MPXS_CONNS>>, _} | T], Acc) ->
-    generate_values_response(C, T, [{<<?FCGI_MPXS_CONNS>>, 
+    generate_values_response(C, T, [{<<?FCGI_MPXS_CONNS>>,
                                   <<1:8>>} | Acc]);
 generate_values_response(_C, [], Acc) ->
     Acc.
@@ -202,13 +212,13 @@ generate_values_response(_C, [], Acc) ->
 
 %%--------------------------------------------------------------------
 %% @spec application_request(State, Request) -> ok.
-%% 
-%% @doc 
+%%
+%% @doc
 %%  Handle stream based application requests.
 %% @end
 %%--------------------------------------------------------------------
-application_request(#c{sock=Sock, pid=Pid}, 
-                    Request = #request{type=?FCGI_BEGIN_REQUEST, 
+application_request(#c{sock=Sock, pid=Pid},
+                    Request = #request{type=?FCGI_BEGIN_REQUEST,
                                        request_id=RequestId}) ->
     case Request#request.content of
         <<?FCGI_RESPONDER:16, Flags:8, _/binary>> ->
@@ -235,20 +245,20 @@ application_request(_C, #request{type=UnknownType}) ->
 
 %%--------------------------------------------------------------------
 %% @spec start_handler(Type, Flags) -> Pid.
-%% 
-%% @doc 
+%%
+%% @doc
 %%  Start a handler for the new request.
 %% @end
 %%--------------------------------------------------------------------
 start_handler(Sock, Type, Flags, Pid, RequestId) ->
     case Flags band ?FCGI_KEEP_CONN of
         0 ->
-            efcgi_request_sup:start_requestor(Sock, 
+            efcgi_request_sup:start_requestor(Sock,
                                               Pid,
                                               RequestId,
                                               Type,
                                               no_keep_alive);
-        _ ->            
+        _ ->
             efcgi_request_sup:start_requestor(Sock,
                                               Pid,
                                               RequestId,
@@ -258,8 +268,8 @@ start_handler(Sock, Type, Flags, Pid, RequestId) ->
 
 %%--------------------------------------------------------------------
 %% @spec get_option(Key, ValList, Default) -> Value | Default.
-%% 
-%% @doc 
+%%
+%% @doc
 %%  Get the option from the list. If no option exits, return default.
 %% @end
 %%--------------------------------------------------------------------

@@ -1,25 +1,34 @@
+%% -*- mode: Erlang; fill-column: 132; comment-column: 118; -*-
 %%%-------------------------------------------------------------------
-%%% Copyright 2006 Eric Merritt
+%%% Copyright (c) 2006, 2007 Erlware
 %%%
-%%% Licensed under the Apache License, Version 2.0 (the "License");  
-%%% you may not use this file except in compliance with the License.
-%%% You may obtain a copy of the License at
+%%% Permission is hereby granted, free of charge, to any
+%%% person obtaining a copy of this software and associated
+%%% documentation files (the "Software"), to deal in the
+%%% Software without restriction, including without limitation
+%%% the rights to use, copy, modify, merge, publish, distribute,
+%%% sublicense, and/or sell copies of the Software, and to permit
+%%% persons to whom the Software is furnished to do so, subject to
+%%% the following conditions:
 %%%
-%%%       http://www.apache.org/licenses/LICENSE-2.0
+%%% The above copyright notice and this permission notice shall
+%%% be included in all copies or substantial portions of the Software.
 %%%
-%%%  Unless required by applicable law or agreed to in writing, software
-%%%  distributed under the License is distributed on an "AS IS" BASIS,
-%%%  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-%%%  implied. See the License for the specific language governing 
-%%%  permissions and limitations under the License.
-%%%
+%%% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+%%% EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+%%% OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+%%% NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+%%% HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+%%% WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+%%% OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+%%% OTHER DEALINGS IN THE SOFTWARE.
 %%%---------------------------------------------------------------------------
 %%% @author Eric Merritt <cyberlync@gmail.com>
-%%% @doc 
-%%%  Very simple module to support some rudimentary debugging nd 
+%%% @doc
+%%%  Very simple module to support some rudimentary debugging nd
 %%   testing.
 %%% @end
-%%% @copyright (C) 2006, Eric Merritt
+%%% @copyright (C) 2006, Erlware
 %%% Created :  5 Dec 2006 by Eric Merritt <cyberlync@gmail.com>
 %%%----------------------------------------------------------------------------
 -module(efcgi_test).
@@ -42,10 +51,10 @@
 %%====================================================================
 %%--------------------------------------------------------------------
 %% @spec start_link() -> {ok,Pid} | ignore | {error,Error}.
-%% 
-%% @doc 
+%%
+%% @doc
 %% Starts the server
-%% @end 
+%% @end
 %%--------------------------------------------------------------------
 start_link() ->
     gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
@@ -59,10 +68,10 @@ start_link() ->
 %%                     {ok, State, Timeout} |
 %%                     ignore               |
 %%                     {stop, Reason}.
-%% 
-%% @doc 
+%%
+%% @doc
 %% Initiates the server
-%% @end 
+%% @end
 %%--------------------------------------------------------------------
 init([]) ->
     {ok, #state{}}.
@@ -74,10 +83,10 @@ init([]) ->
 %%                                      {noreply, State, Timeout} |
 %%                                      {stop, Reason, Reply, State} |
 %%                                      {stop, Reason, State}.
-%% 
-%% @doc 
+%%
+%% @doc
 %% Handling call messages
-%% @end 
+%% @end
 %%--------------------------------------------------------------------
 handle_call(_Request, _From, State) ->
     Reply = ok,
@@ -87,10 +96,10 @@ handle_call(_Request, _From, State) ->
 %% @spec handle_cast(Msg, State) -> {noreply, State} |
 %%                                      {noreply, State, Timeout} |
 %%                                      {stop, Reason, State}.
-%% 
-%% @doc 
+%%
+%% @doc
 %% Handling cast messages
-%% @end 
+%% @end
 %%--------------------------------------------------------------------
 handle_cast(_Msg, State) ->
     {noreply, State}.
@@ -99,10 +108,10 @@ handle_cast(_Msg, State) ->
 %% @spec handle_info(Info, State) -> {noreply, State} |
 %%                                       {noreply, State, Timeout} |
 %%                                       {stop, Reason, State}.
-%% 
-%% @doc 
+%%
+%% @doc
 %% Handling all non call/cast messages
-%% @end 
+%% @end
 %%--------------------------------------------------------------------
 handle_info({init, RequestId, Type}, State) ->
     io:format("~w~w~n", [RequestId, Type]),
@@ -125,23 +134,23 @@ handle_info({abort, _RequestId, _Reason}, State) ->
 
 %%--------------------------------------------------------------------
 %% @spec terminate(Reason, State) -> void().
-%% 
-%% @doc 
+%%
+%% @doc
 %% This function is called by a gen_server when it is about to
 %% terminate. It should be the opposite of Module:init/1 and do any necessary
 %% cleaning up. When it returns, the gen_server terminates with Reason.
 %% The return value is ignored.
-%% @end 
+%% @end
 %%--------------------------------------------------------------------
 terminate(_Reason, _State) ->
     ok.
 
 %%--------------------------------------------------------------------
 %% @spec code_change(OldVsn, State, Extra) -> {ok, NewState}.
-%% 
-%% @doc 
+%%
+%% @doc
 %% Convert process state when code is changed
-%% @end 
+%% @end
 %%--------------------------------------------------------------------
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.

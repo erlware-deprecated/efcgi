@@ -1,24 +1,33 @@
+%% -*- mode: Erlang; fill-column: 132; comment-column: 118; -*-
 %%%-------------------------------------------------------------------
-%%% Copyright 2006 Eric Merritt
+%%% Copyright (c) 2006, 2007 Erlware
 %%%
-%%% Licensed under the Apache License, Version 2.0 (the "License");  
-%%% you may not use this file except in compliance with the License.
-%%% You may obtain a copy of the License at
+%%% Permission is hereby granted, free of charge, to any
+%%% person obtaining a copy of this software and associated
+%%% documentation files (the "Software"), to deal in the
+%%% Software without restriction, including without limitation
+%%% the rights to use, copy, modify, merge, publish, distribute,
+%%% sublicense, and/or sell copies of the Software, and to permit
+%%% persons to whom the Software is furnished to do so, subject to
+%%% the following conditions:
 %%%
-%%%       http://www.apache.org/licenses/LICENSE-2.0
+%%% The above copyright notice and this permission notice shall
+%%% be included in all copies or substantial portions of the Software.
 %%%
-%%%  Unless required by applicable law or agreed to in writing, software
-%%%  distributed under the License is distributed on an "AS IS" BASIS,
-%%%  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-%%%  implied. See the License for the specific language governing 
-%%%  permissions and limitations under the License.
-%%%
+%%% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+%%% EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+%%% OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+%%% NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+%%% HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+%%% WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+%%% OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+%%% OTHER DEALINGS IN THE SOFTWARE.
 %%%---------------------------------------------------------------------------
 %%% @author Eric Merritt <cyberlync@gmail.com>
-%%% @doc 
+%%% @doc
 %%%  Supports request Id <> Pid handler.
 %%% @end
-%%% @copyright (C) 2006, Eric Merritt
+%%% @copyright (C) 2006, Erlware
 %%% Created : 30 Nov 2006 by Eric Merritt <cyberlync@gmail.com>
 %%%----------------------------------------------------------------------------
 -module(efcgi_request_proxy).
@@ -28,7 +37,7 @@
 -define(SERVER, ?MODULE).
 
 %% API
--export([start_link/0, params/2, stdin/2, 
+-export([start_link/0, params/2, stdin/2,
          stdout/2, stderr/2, abort_request/1,
          register/2, unregister/1]).
 
@@ -43,18 +52,18 @@
 %%====================================================================
 %%--------------------------------------------------------------------
 %% @spec start_link() -> {ok,Pid} | ignore | {error,Error}.
-%% 
-%% @doc 
+%%
+%% @doc
 %% Starts the server
-%% @end 
+%% @end
 %%--------------------------------------------------------------------
 start_link() ->
     gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
 %%--------------------------------------------------------------------
 %% @spec params(RequestId, Params) -> ok.
-%% 
-%% @doc 
+%%
+%% @doc
 %%  Send the params binary to the service identified by params.
 %% @end
 %%--------------------------------------------------------------------
@@ -63,8 +72,8 @@ params(RequestId, Params) ->
 
 %%--------------------------------------------------------------------
 %% @spec stdin(RequestId, Stdin) -> ok.
-%% 
-%% @doc 
+%%
+%% @doc
 %%  Send the stdin stream part to the service.
 %% @end
 %%--------------------------------------------------------------------
@@ -74,8 +83,8 @@ stdin(RequestId, Stdin) ->
 
 %%--------------------------------------------------------------------
 %% @spec stdout(RequestId, Data) -> ok.
-%% 
-%% @doc 
+%%
+%% @doc
 %%  send stdout to the request
 %% @end
 %%--------------------------------------------------------------------
@@ -85,8 +94,8 @@ stdout(RequestId, Data) ->
 
 %%--------------------------------------------------------------------
 %% @spec stderr(RequestId, Data) -> ok.
-%% 
-%% @doc 
+%%
+%% @doc
 %%  send stderr to the request.
 %% @end
 %%--------------------------------------------------------------------
@@ -96,8 +105,8 @@ stderr(RequestId, Data) ->
 
 %%--------------------------------------------------------------------
 %% @spec abort_request(RequestId) -> ok.
-%% 
-%% @doc 
+%%
+%% @doc
 %%   Abort the current request being processed by request id.
 %% @end
 %%--------------------------------------------------------------------
@@ -106,8 +115,8 @@ abort_request(RequestId) ->
 
 %%--------------------------------------------------------------------
 %% @spec register(RequestId, Pid) -> ok.
-%% 
-%% @doc 
+%%
+%% @doc
 %%  Register a request id with a pid for future reference.
 %% @end
 %%--------------------------------------------------------------------
@@ -116,8 +125,8 @@ register(RequestId, Pid) ->
 
 %%--------------------------------------------------------------------
 %% @spec unregister(RequestId) -> ok.
-%% 
-%% @doc 
+%%
+%% @doc
 %%  Unregister a currently registerd request id.
 %% @end
 %%--------------------------------------------------------------------
@@ -133,10 +142,10 @@ unregister(RequestId) ->
 %%                     {ok, State, Timeout} |
 %%                     ignore               |
 %%                     {stop, Reason}.
-%% 
-%% @doc 
+%%
+%% @doc
 %% Initiates the server
-%% @end 
+%% @end
 %%--------------------------------------------------------------------
 init([]) ->
     {ok, #state{}}.
@@ -148,10 +157,10 @@ init([]) ->
 %%                                      {noreply, State, Timeout} |
 %%                                      {stop, Reason, Reply, State} |
 %%                                      {stop, Reason, State}.
-%% 
-%% @doc 
+%%
+%% @doc
 %% Handling call mappings
-%% @end 
+%% @end
 %%--------------------------------------------------------------------
 handle_call(_Request, _From, State) ->
     Reply = ok,
@@ -161,10 +170,10 @@ handle_call(_Request, _From, State) ->
 %% @spec handle_cast(Msg, State) -> {noreply, State} |
 %%                                      {noreply, State, Timeout} |
 %%                                      {stop, Reason, State}.
-%% 
-%% @doc 
+%%
+%% @doc
 %% Handling cast mappings
-%% @end 
+%% @end
 %%--------------------------------------------------------------------
 handle_cast({register, RequestId, Pid}, State) ->
     Mappings = [{RequestId, Pid} | State#state.mappings],
@@ -200,33 +209,33 @@ handle_cast({stderr, RequestId, Data}, State) ->
 %% @spec handle_info(Info, State) -> {noreply, State} |
 %%                                       {noreply, State, Timeout} |
 %%                                       {stop, Reason, State}.
-%% 
-%% @doc 
+%%
+%% @doc
 %% Handling all non call/cast mappings
-%% @end 
+%% @end
 %%--------------------------------------------------------------------
 handle_info(_Info, State) ->
     {noreply, State}.
 
 %%--------------------------------------------------------------------
 %% @spec terminate(Reason, State) -> void().
-%% 
-%% @doc 
+%%
+%% @doc
 %% This function is called by a gen_server when it is about to
 %% terminate. It should be the opposite of Module:init/1 and do any necessary
 %% cleaning up. When it returns, the gen_server terminates with Reason.
 %% The return value is ignored.
-%% @end 
+%% @end
 %%--------------------------------------------------------------------
 terminate(_Reason, _State) ->
     ok.
 
 %%--------------------------------------------------------------------
 %% @spec code_change(OldVsn, State, Extra) -> {ok, NewState}.
-%% 
-%% @doc 
+%%
+%% @doc
 %% Convert process state when code is changed
-%% @end 
+%% @end
 %%--------------------------------------------------------------------
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
@@ -236,8 +245,8 @@ code_change(_OldVsn, State, _Extra) ->
 %%====================================================================
 %%--------------------------------------------------------------------
 %% @spec remove(RequestId, Mappings, Acc) -> NMappings.
-%% 
-%% @doc 
+%%
+%% @doc
 %%  Remove the specified request id from the list of mappings
 %% @end
 %%--------------------------------------------------------------------
@@ -251,8 +260,8 @@ remove(_RequestId, [], Acc) ->
 
 %%--------------------------------------------------------------------
 %% @spec get(RequestId, Ids) -> Value | no_pid.
-%% 
-%% @doc 
+%%
+%% @doc
 %%  Get the value associated with the passed in request id.
 %% @end
 %%--------------------------------------------------------------------
@@ -266,10 +275,10 @@ get(_, []) ->
 
 %%--------------------------------------------------------------------
 %% @spec params(Pid, Params) -> ok.
-%% 
-%% @doc 
+%%
+%% @doc
 %%  Send params to the system
-%% @end 
+%% @end
 %%--------------------------------------------------------------------
 send_params(Pid, Params) ->
     gen_server:cast(Pid, {params, Params}).
@@ -277,18 +286,18 @@ send_params(Pid, Params) ->
 
 %%--------------------------------------------------------------------
 %% @spec stdin(Pid, Data) -> ok
-%% 
-%% @doc 
+%%
+%% @doc
 %%  Send stdin data to the system
-%% @end 
+%% @end
 %%--------------------------------------------------------------------
 send_stdin(Pid, Data) ->
     gen_server:cast(Pid, {stdin, Data}).
 
 %%--------------------------------------------------------------------
 %% @spec send_stdout(Pid, Data) -> ok.
-%% 
-%% @doc 
+%%
+%% @doc
 %%  Send the data to stdout.
 %% @end
 %%--------------------------------------------------------------------
@@ -297,8 +306,8 @@ send_stdout(Pid, Data) ->
 
 %%--------------------------------------------------------------------
 %% @spec send_stderr(Pid, Data) -> ok.
-%% 
-%% @doc 
+%%
+%% @doc
 %%  Send the data to the request.
 %% @end
 %%--------------------------------------------------------------------
@@ -307,8 +316,8 @@ send_stderr(Pid, Data) ->
 
 %%--------------------------------------------------------------------
 %% @spec send_abort(Pid) -> ok.
-%% 
-%% @doc 
+%%
+%% @doc
 %%  Send the request abort sequence.
 %% @end
 %%--------------------------------------------------------------------

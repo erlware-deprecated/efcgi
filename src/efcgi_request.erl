@@ -1,27 +1,36 @@
-%%%----------------------------------------------------------------------------
-%%% Copyright 2006 Eric Merritt
+%% -*- mode: Erlang; fill-column: 132; comment-column: 118; -*-
+%%%-------------------------------------------------------------------
+%%% Copyright (c) 2006, 2007 Erlware
 %%%
-%%% Licensed under the Apache License, Version 2.0 (the "License");  
-%%% you may not use this file except in compliance with the License.
-%%% You may obtain a copy of the License at
+%%% Permission is hereby granted, free of charge, to any
+%%% person obtaining a copy of this software and associated
+%%% documentation files (the "Software"), to deal in the
+%%% Software without restriction, including without limitation
+%%% the rights to use, copy, modify, merge, publish, distribute,
+%%% sublicense, and/or sell copies of the Software, and to permit
+%%% persons to whom the Software is furnished to do so, subject to
+%%% the following conditions:
 %%%
-%%%       http://www.apache.org/licenses/LICENSE-2.0
+%%% The above copyright notice and this permission notice shall
+%%% be included in all copies or substantial portions of the Software.
 %%%
-%%%  Unless required by applicable law or agreed to in writing, software
-%%%  distributed under the License is distributed on an "AS IS" BASIS,
-%%%  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
-%%%  implied. See the License for the specific language governing 
-%%%  permissions and limitations under the License.
-%%%
+%%% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+%%% EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+%%% OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+%%% NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+%%% HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+%%% WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+%%% OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+%%% OTHER DEALINGS IN THE SOFTWARE.
 %%%---------------------------------------------------------------------------
-%%% 
+%%%
 %%% @author Eric Merritt <cyberlync@gmail.com>
-%%% @doc 
+%%% @doc
 %%%  Support for direct request handler. One of these should exist per
 %%%  request id.
 %%% @end
-%%% @copyright (C) 2006, Eric Merritt
-%%% Created : 29 Nov 2006 by Eric Merritt 
+%%% @copyright (C) 2006, Erlware
+%%% Created : 29 Nov 2006 by Eric Merritt
 %%%----------------------------------------------------------------------------
 -module(efcgi_request).
 
@@ -34,15 +43,15 @@
 
 
 %% API
--export([start_link/5,  stdout/2, stderr/2, close_stdout/1, 
+-export([start_link/5,  stdout/2, stderr/2, close_stdout/1,
          close_stderr/1]).
 
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
 
--record(state, {sock, request_id, 
-                pid, 
+-record(state, {sock, request_id,
+                pid,
                 keep_alive,
                 params=[]}).
 
@@ -51,10 +60,10 @@
 %%====================================================================
 %%--------------------------------------------------------------------
 %% @spec start_link() -> {ok,Pid} | ignore | {error,Error}.
-%% 
-%% @doc 
+%%
+%% @doc
 %% Starts the server
-%% @end 
+%% @end
 %%--------------------------------------------------------------------
 start_link(Sock,
            Pid,
@@ -70,8 +79,8 @@ start_link(Sock,
 
 %%--------------------------------------------------------------------
 %% @spec stdout(RequestId, Data) -> ok.
-%% 
-%% @doc  
+%%
+%% @doc
 %%  Send stdout data to the server
 %% @end
 %%--------------------------------------------------------------------
@@ -80,8 +89,8 @@ stdout(RequestId, Data) ->
 
 %%--------------------------------------------------------------------
 %% @spec close_stdout(RequestId) -> ok.
-%% 
-%% @doc 
+%%
+%% @doc
 %%  Close the stdout stream and end the request.
 %% @end
 %%--------------------------------------------------------------------
@@ -90,8 +99,8 @@ close_stdout(RequestId) ->
 
 %%--------------------------------------------------------------------
 %% @spec stderr(RequestId, Data) -> ok.
-%% 
-%% @doc 
+%%
+%% @doc
 %%  Send data to stderr.
 %% @end
 %%--------------------------------------------------------------------
@@ -100,8 +109,8 @@ stderr(RequestId, Data) ->
 
 %%--------------------------------------------------------------------
 %% @spec close_stderr(RequestId) -> ok.
-%% 
-%% @doc 
+%%
+%% @doc
 %%  Close down the stderr stream and end the request.
 %% @end
 %%--------------------------------------------------------------------
@@ -118,10 +127,10 @@ close_stderr(RequestId) ->
 %%                     {ok, State, Timeout} |
 %%                     ignore               |
 %%                     {stop, Reason}.
-%% 
-%% @doc 
+%%
+%% @doc
 %% Initiates the server
-%% @end 
+%% @end
 %%--------------------------------------------------------------------
 init([Sock, Pid, RequestId, Type, KeepAlive]) ->
     efcgi_request_proxy:register(RequestId, self()),
@@ -137,10 +146,10 @@ init([Sock, Pid, RequestId, Type, KeepAlive]) ->
 %%                                      {noreply, State, Timeout} |
 %%                                      {stop, Reason, Reply, State} |
 %%                                      {stop, Reason, State}.
-%% 
-%% @doc 
+%%
+%% @doc
 %% Handling call messages
-%% @end 
+%% @end
 %%--------------------------------------------------------------------
 handle_call(_Request, _From, State) ->
     Reply = ok,
@@ -150,12 +159,12 @@ handle_call(_Request, _From, State) ->
 %% @spec handle_cast(Msg, State) -> {noreply, State} |
 %%                                      {noreply, State, Timeout} |
 %%                                      {stop, Reason, State}.
-%% 
-%% @doc 
+%%
+%% @doc
 %% Handling cast messages
-%% @end 
+%% @end
 %%--------------------------------------------------------------------
-handle_cast({params, <<>>}, State=#state{params=Params, 
+handle_cast({params, <<>>}, State=#state{params=Params,
                                          pid=Pid,
                                          request_id = RequestId}) ->
     ActualParams = efcgi_parse:parse_pairs(list_to_binary(
@@ -184,10 +193,10 @@ handle_cast(abort, State = #state{pid = Pid, request_id = RequestId}) ->
 %% @spec handle_info(Info, State) -> {noreply, State} |
 %%                                       {noreply, State, Timeout} |
 %%                                       {stop, Reason, State}.
-%% 
-%% @doc 
+%%
+%% @doc
 %% Handling all non call/cast messages
-%% @end 
+%% @end
 %%--------------------------------------------------------------------
 handle_info(timeout, State = #state{pid = Pid, request_id = RequestId}) ->
     Pid ! {abort, RequestId, timeout},
@@ -196,13 +205,13 @@ handle_info(timeout, State = #state{pid = Pid, request_id = RequestId}) ->
 
 %%--------------------------------------------------------------------
 %% @spec terminate(Reason, State) -> void().
-%% 
-%% @doc 
+%%
+%% @doc
 %% This function is called by a gen_server when it is about to
 %% terminate. It should be the opposite of Module:init/1 and do any necessary
 %% cleaning up. When it returns, the gen_server terminates with Reason.
 %% The return value is ignored.
-%% @end 
+%% @end
 %%--------------------------------------------------------------------
 terminate(_Reason, #state{request_id=RequestId}) ->
     efcgi_request_proxy:unregister(RequestId),
@@ -210,10 +219,10 @@ terminate(_Reason, #state{request_id=RequestId}) ->
 
 %%--------------------------------------------------------------------
 %% @spec code_change(OldVsn, State, Extra) -> {ok, NewState}.
-%% 
-%% @doc 
+%%
+%% @doc
 %% Convert process state when code is changed
-%% @end 
+%% @end
 %%--------------------------------------------------------------------
 code_change(_OldVsn, State, _Extra) ->
     {ok, State}.
@@ -222,29 +231,29 @@ code_change(_OldVsn, State, _Extra) ->
 %%% Internal functions
 %%====================================================================
 
-handle_output(State = #state{sock=Sock, request_id=RequestId}, 
+handle_output(State = #state{sock=Sock, request_id=RequestId},
               {stdout, end_of_stream}) ->
-    efcgi_parse:end_stream(Sock, 
-                           ?FCGI_STDOUT, 
+    efcgi_parse:end_stream(Sock,
+                           ?FCGI_STDOUT,
                            RequestId),
     handle_request_end(State);
-handle_output(State = #state{sock=Sock, request_id=RequestId}, 
+handle_output(State = #state{sock=Sock, request_id=RequestId},
               {stderr, end_of_stream}) ->
-    efcgi_parse:end_stream(Sock, 
-                           ?FCGI_STDERR, 
+    efcgi_parse:end_stream(Sock,
+                           ?FCGI_STDERR,
                            RequestId),
     handle_request_end(State);
 handle_output(#state{sock=Sock,
-                             request_id=RequestId}, 
+                             request_id=RequestId},
               {stdout, Content}) ->
-    efcgi_parse:write_record(Sock, 
-                             ?FCGI_STDOUT, 
+    efcgi_parse:write_record(Sock,
+                             ?FCGI_STDOUT,
                              RequestId, convert(Content));
 handle_output(#state{sock=Sock,
-                             request_id=RequestId}, 
+                             request_id=RequestId},
               {stderr, Content}) ->
-    efcgi_parse:write_record(Sock, 
-                             ?FCGI_STDERR, 
+    efcgi_parse:write_record(Sock,
+                             ?FCGI_STDERR,
                              RequestId, convert(Content));
 handle_output(_State, Something) ->
     exit({error, {unexpected_return, Something}}).
@@ -252,19 +261,19 @@ handle_output(_State, Something) ->
 
 %%--------------------------------------------------------------------
 %% @spec handle_request_end(State) -> ok.
-%% 
-%% @doc 
+%%
+%% @doc
 %%  Handle the end of the request. Close the socket if no_keep_alive.
 %%  shut down with normal in either case.
 %% @end
 %%--------------------------------------------------------------------
-handle_request_end(#state{sock=Sock, request_id=RequestId, 
+handle_request_end(#state{sock=Sock, request_id=RequestId,
                           keep_alive=no_keep_alive}) ->
     ok = efcgi_parse:write_record(Sock, ?FCGI_END_REQUEST, RequestId,
                                   <<0:32, ?FCGI_REQUEST_COMPLETE:8, 0:24>>),
     ok = gen_tcp:close(Sock),
     exit(normal);
-handle_request_end(#state{sock=Sock, request_id=RequestId, 
+handle_request_end(#state{sock=Sock, request_id=RequestId,
                           keep_alive=keep_alive}) ->
     ok = efcgi_parse:write_record(Sock, ?FCGI_END_REQUEST, RequestId,
                                   <<0:32, ?FCGI_REQUEST_COMPLETE:8, 0:24>>),
@@ -273,8 +282,8 @@ handle_request_end(#state{sock=Sock, request_id=RequestId,
 
 %%--------------------------------------------------------------------
 %% @spec convert(Content) -> ConvertedContent.
-%% 
-%% @doc 
+%%
+%% @doc
 %%  Convert the output returned from the callback to a usable binary.
 %% @end
 %%--------------------------------------------------------------------
